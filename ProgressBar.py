@@ -1,4 +1,5 @@
 import math
+import threading
 
 class ProgressBar:
     """
@@ -32,6 +33,10 @@ class ProgressBar:
         # concatenated string
         self.string = ""
 
+        # mutex lock and condition variable for the string object
+        self.lock = threading.Lock()
+        self.cv = threading.Condition(self.lock)
+
     def __generate_string(self) -> str:
         """
         Generate the string for the progress bar.
@@ -39,34 +44,39 @@ class ProgressBar:
         :retval: Progress bar in string form.
         """
         
-        s: str = "[{:.2f}%] [".format(self.percentage*100)
+        # lock the mutex
+        with self.lock:
+            s: str = "[{:.2f}%] [".format(self.percentage*100)
 
-        n_chars = math.ceil(self.width * self.percentage)
+            n_chars = math.ceil(self.width * self.percentage)
 
-        # add fill characters
-        for i in range(n_chars-1):
-            s += "#"
+            # add fill characters
+            for i in range(n_chars-1):
+                s += "#"
 
-        # add the spinning character if not the last
-        if n_chars < self.width:
-            s += self.spin[self.cur_spin]
-            self.cur_spin += 1
-            self.cur_spin %= 4
-        else:
-            s += "#"
+            # add the spinning character if not the last
+            if n_chars < self.width:
+                s += self.spin[self.cur_spin]
+                self.cur_spin += 1
+                self.cur_spin %= 4
+            else:
+                s += "#"
 
-        # add the hollow characters
-        for i in range(self.width - n_chars):
-            s += "-"
+            # add the hollow characters
+            for i in range(self.width - n_chars):
+                s += "-"
 
-        # terminate the bar
-        s += "]"
+            # terminate the bar
+            s += "]"
 
-        # if the user wants details
-        if self.details:
-            s += f" ({self.cur_element}/{self.total_elements})"
+            # if the user wants details
+            if self.details:
+                s += f" ({self.cur_element}/{self.total_elements})"
 
-        self.string = s
+            self.string = s
+
+            # notify waiting threads
+            self.cv.notify()
 
 
     def update(self, cur_element: int) -> None:
@@ -88,7 +98,9 @@ class ProgressBar:
         self.percentage = self.cur_element / self.total_elements
 
         # generate the string for the next time
-        self.__generate_string()
+        # start a thread to do it in the background
+        thread = threading.Thread(target=self.__generate_string)
+        thread.start()
 
 
     def __repr__(self) -> str:
@@ -97,7 +109,10 @@ class ProgressBar:
 
         :retval: Progress bar in string form.
         """
-        return self.__generate_string()
+        s = None
+        with self.cv:
+            s = self.string
+        return s
 
     def print(self) -> None:
         """
@@ -106,5 +121,8 @@ class ProgressBar:
         :retval: None
         """
 
-        print(f"\r{self.string}", end="")
+        s = None
+        with self.cv:
+            s = self.string
+        print(f"\r{s}", end="")
 

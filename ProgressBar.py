@@ -37,7 +37,7 @@ class ProgressBar:
         self.lock = threading.Lock()
         self.cv = threading.Condition(self.lock)
 
-    def __generate_string(self) -> str:
+    def __generate_string(self, extra: str = "") -> str:
         """
         Generate the string for the progress bar.
 
@@ -73,17 +73,22 @@ class ProgressBar:
             if self.details:
                 s += f" ({self.cur_element}/{self.total_elements})"
 
+            # add extra
+            if extra != "":
+                s += f" - {extra}"
+
             self.string = s
 
             # notify waiting threads
             self.cv.notify()
 
 
-    def update(self, cur_element: int) -> None:
+    def update(self, cur_element: int, extra: str = "") -> None:
         """
         Update the progress bar.
 
         :param cur_element: Current element.
+        :param extra: Extra string, as the user may wish (e.g. logging losses)
 
         :retval: None
         """
@@ -99,7 +104,7 @@ class ProgressBar:
 
         # generate the string for the next time
         # start a thread to do it in the background
-        thread = threading.Thread(target=self.__generate_string)
+        thread = threading.Thread(target=self.__generate_string, args=(extra,))
         thread.start()
 
 

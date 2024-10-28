@@ -5,7 +5,7 @@ class ProgressBar:
     Progress bar classes. Creates a progress bar instance with given attributes.
     """
 
-    def __init__(self, total_elements: float, width: int = 20) -> None:
+    def __init__(self, total_elements: int, width: int = 20) -> None:
         """
         Construct a new ProgressBar object.
 
@@ -63,7 +63,7 @@ class ProgressBar:
         self.string = s
 
 
-    def update(self, cur_element: float) -> None:
+    def update(self, cur_element: int) -> None:
         """
         Update the progress bar.
 

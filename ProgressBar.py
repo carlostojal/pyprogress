@@ -1,5 +1,5 @@
-import math
-import threading
+from math import ceil
+from threading import Thread, Lock, Condition
 
 class ProgressBar:
     """
@@ -34,8 +34,8 @@ class ProgressBar:
         self.string = ""
 
         # mutex lock and condition variable for the string object
-        self.lock = threading.Lock()
-        self.cv = threading.Condition(self.lock)
+        self.lock = Lock()
+        self.cv = Condition(self.lock)
 
     def __generate_string(self, extra: str = "") -> str:
         """
@@ -48,7 +48,7 @@ class ProgressBar:
         with self.lock:
             s: str = "[{:.2f}%] [".format(self.percentage*100)
 
-            n_chars = math.ceil(self.width * self.percentage)
+            n_chars = ceil(self.width * self.percentage)
 
             # add fill characters
             for i in range(n_chars-1):
@@ -104,7 +104,7 @@ class ProgressBar:
 
         # generate the string for the next time
         # start a thread to do it in the background
-        thread = threading.Thread(target=self.__generate_string, args=(extra,))
+        thread = Thread(target=self.__generate_string, args=(extra,))
         thread.start()
 
 

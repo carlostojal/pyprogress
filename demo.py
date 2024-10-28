@@ -10,3 +10,5 @@ if __name__ == "__main__":
         bar.print()
         time.sleep(0.1)
 
+    print()
+

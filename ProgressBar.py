@@ -23,6 +23,11 @@ class ProgressBar:
         self.cur_element = 0.0 # current element
         self.percentage = 0.0
 
+        # spinning characters
+        self.cur_spin = 0
+        self.spin = ['/', '-', '\\', '|']
+
+        # concatenated string
         self.string = ""
 
     def __generate_string(self) -> str:
@@ -35,11 +40,21 @@ class ProgressBar:
         s: str = "[{:.2f}%] [".format(self.percentage*100)
 
         n_chars = math.ceil(self.width * self.percentage)
-        for i in range(n_chars):
+
+        # add fill characters
+        for i in range(n_chars-1):
             s += "#"
+
+        # add the spinning character
+        s += self.spin[self.cur_spin]
+        self.cur_spin += 1
+        self.cur_spin %= 4
+
+        # add the hollow characters
         for i in range(self.width - n_chars):
             s += "-"
 
+        # terminate the bar
         s += "]"
 
         self.string = s

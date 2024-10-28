@@ -20,7 +20,7 @@ Say no more!
 from pyprogress.ProgressBar import ProgressBar
 
 # create a bar for 100 processing units with default width
-bar = ProgressBar(100.0)
+bar = ProgressBar(100)
 
 # set to unit 75/100
 bar.update(75)

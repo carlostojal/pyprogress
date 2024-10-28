@@ -6,7 +6,7 @@ Library for simple and pretty progress bars in Python.
 
 Ever wanted to use a progress bar like this?
 
-```[20.00%] [###\----------------]```
+```[22.00%] [####\---------------] (11/50)```
 
 Say no more!
 

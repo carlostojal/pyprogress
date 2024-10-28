@@ -5,12 +5,13 @@ class ProgressBar:
     Progress bar classes. Creates a progress bar instance with given attributes.
     """
 
-    def __init__(self, total_elements: int, width: int = 20) -> None:
+    def __init__(self, total_elements: int, width: int = 20, details: bool = True) -> None:
         """
         Construct a new ProgressBar object.
 
         :param total_elements: Number of elements / units of processing.
         :param width: Progress bar width in characters.
+        :param details: Show details (current/total elements)
 
         :retval None
         """
@@ -18,9 +19,10 @@ class ProgressBar:
         # assign the members
         self.total_elements = total_elements
         self.width = width
+        self.details = details
 
         # current element and percentage
-        self.cur_element = 0.0 # current element
+        self.cur_element = 0 # current element
         self.percentage = 0.0
 
         # spinning characters
@@ -59,6 +61,10 @@ class ProgressBar:
 
         # terminate the bar
         s += "]"
+
+        # if the user wants details
+        if self.details:
+            s += f" ({self.cur_element}/{self.total_elements})"
 
         self.string = s
 

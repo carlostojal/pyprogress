@@ -45,10 +45,13 @@ class ProgressBar:
         for i in range(n_chars-1):
             s += "#"
 
-        # add the spinning character
-        s += self.spin[self.cur_spin]
-        self.cur_spin += 1
-        self.cur_spin %= 4
+        # add the spinning character if not the last
+        if n_chars < self.width:
+            s += self.spin[self.cur_spin]
+            self.cur_spin += 1
+            self.cur_spin %= 4
+        else:
+            s += "#"
 
         # add the hollow characters
         for i in range(self.width - n_chars):
